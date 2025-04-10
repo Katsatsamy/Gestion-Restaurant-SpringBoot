@@ -1,6 +1,5 @@
 package com.example.restaurantgestion.rest;
 
-import com.example.restaurantgestion.entity.Ingredient;
 import com.example.restaurantgestion.entity.Movement;
 import com.example.restaurantgestion.entity.Unity;
 import lombok.AllArgsConstructor;

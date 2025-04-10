@@ -1,6 +1,7 @@
 package com.example.restaurantgestion.repository;
 
 import com.example.restaurantgestion.entity.*;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,7 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Repository
 public class DishOrderCudOperation implements CrudOperations<DishOrder> {
     private DataSource dataSource = new DataSource();
 
@@ -65,8 +66,32 @@ public class DishOrderCudOperation implements CrudOperations<DishOrder> {
         }
     }
 
-    public DishOrderStatusHistory changeStatus(DishOrder dishOrder){
+    public DishOrder findById(String orderId, String dishId) {
+        DishOrder dishOrder = null;
+        String sql = "SELECT id, id_dish, quantity FROM dish_order WHERE id_dish = ? AND id_order = ?";
+        try(Connection connection = dataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)){
+            statement.setString(1, dishId);
+            statement.setString(2, orderId);
+            try(ResultSet resultSet = statement.executeQuery()){
+                if(resultSet.next()){
+                    dishOrder = new DishOrder(
+                            resultSet.getString("id"),
+                            findDishById(resultSet.getString("id_dish")),
+                            resultSet.getDouble("quantity"),
+                            findByDishOrderId(resultSet.getString("id"))
+                    );
+                }
+            }
+            return dishOrder;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public DishOrderStatusHistory changeStatus(String orderId, String dishId){
         DishOrderStatusHistory dishOrderStatusHistory = new DishOrderStatusHistory();
+        DishOrder dishOrder = findById(orderId, dishId);
         OrderStatus orderStatus = dishOrder.getActualStatus().getStatus();
 
         switch(orderStatus){

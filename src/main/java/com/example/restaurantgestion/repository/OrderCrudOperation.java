@@ -2,6 +2,8 @@ package com.example.restaurantgestion.repository;
 
 
 import com.example.restaurantgestion.entity.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class OrderCrudOperation implements CrudOperations<Order> {
     private DataSource dataSource = new DataSource();
 
@@ -91,6 +94,37 @@ public class OrderCrudOperation implements CrudOperations<Order> {
     @Override
     public List<Order> saveAll(List<Order> list) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public ResponseEntity addDish(String orderId, List<DishOrderRest> dishOrderRests) {
+        for(DishOrderRest dishOrderRest : dishOrderRests){
+            String sql = "SELECT * FROM dish_order WHERE id_dish = ? AND id_order = ?";
+            String sqlCreate = "INSERT INTO dish_order (id_dish, id_order, quantity) VALUES (?, ?, ?)";
+            String sqlUpdate = "UPDATE dish_order SET quantity = ? WHERE id_order = ? AND id_dish = ?";
+            try(Connection connection = dataSource.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)){
+                statement.setString(1, dishOrderRest.getId());
+                statement.setString(2, orderId);
+                try(ResultSet resultSet = statement.executeQuery()){
+                    if(resultSet == null){
+                        PreparedStatement createStatement = connection.prepareStatement(sqlCreate);
+                        createStatement.setString(1, dishOrderRest.getId());
+                        createStatement.setString(2, orderId);
+                        createStatement.setDouble(3, dishOrderRest.getQuantity());
+                        createStatement.executeUpdate();
+                    }else {
+                        PreparedStatement updateStatement = connection.prepareStatement(sqlUpdate);
+                        updateStatement.setDouble(1, dishOrderRest.getQuantity());
+                        updateStatement.setString(2, orderId);
+                        updateStatement.setString(3, dishOrderRest.getId());
+                        updateStatement.executeUpdate();
+                    }
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return ResponseEntity.ok().build();
     }
 
     public List<DishOrder> findDishOrderByOrderId(String orderId) {
