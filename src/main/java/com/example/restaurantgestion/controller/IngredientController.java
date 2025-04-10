@@ -48,7 +48,7 @@ public class IngredientController {
     }
 
     @PutMapping("/ingredients")
-    public ResponseEntity<?> putIngredient(@RequestBody List<Ingredient> ingredients) {
+    public ResponseEntity<?> putIngredients(@RequestBody List<Ingredient> ingredients) {
         return ResponseEntity.ok(ingredientService.saveAll(ingredients));
     }
 

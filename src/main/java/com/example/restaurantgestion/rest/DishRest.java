@@ -12,7 +12,7 @@ import java.util.List;
 public class DishRest {
     private String id;
     private String name;
-    private final int unitPrice;
+    private int unitPrice;
     private List<IngredientDishRest> ingredients;
     private Double availableQuantity;
 }

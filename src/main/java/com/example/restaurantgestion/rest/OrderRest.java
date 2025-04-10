@@ -13,6 +13,6 @@ import java.util.List;
 @EqualsAndHashCode
 public class OrderRest {
     private String id;
-    private List<DishOrderRest> ingredientOrderRests;
+    private List<DishOrderRest> dishOrderRests;
     private OrderStatus status;
 }

@@ -1,0 +1,530 @@
+openapi: 3.0.1
+info:
+  title: Restaurant Management API
+  description : API pour la gestion de restaurant
+  version: 1.0.0
+
+paths:
+  /ingredients:
+    get:
+      tags:
+        - Ingredients
+      summary: Recuperation de la liste des ingrédients
+      operationId: getAllIngredients
+      parameters:
+        - name: priceMiniFilter
+          in: query
+          description: Prix minimun pour filter les ingrédients
+          required: false
+          schema:
+            type: number
+            format: double
+            minimum: 0
+            example: 2.0
+        - name: priceMaxFilter
+          in: query
+          description: Prix maximum pour filtrer les ingrédients
+          required: false
+          schema:
+            type: number
+            format: double
+            example: 5.0
+      responses:
+        '200':
+          description: Liste des ingrédients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IngredientMapper'
+        '400':
+          description: Requete invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Creation des ingredients
+      operationId: putIngredients
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Ingredient'
+      responses:
+        '200':
+          description: Creation des ingredients finis avec succés
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ingredient'
+
+        '400':
+          description: Donnée en entré est invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Creation des ingredients
+      operationId: putIngredients
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Ingredient'
+      responses:
+        '200':
+          description: Creation des ingredients finis avec succés
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ingredient'
+
+        '400':
+          description: Donnée en entré est invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /ingredients/{id}:
+    get:
+      summary: Recuperation d'un ingredient à l'aide son id
+      operationId: getIngredientById
+      parameters:
+        - name: id
+          in: path
+          description: Id de l'ingredient à recupérer
+          required: true
+          schema:
+            type: string
+            example: "1"
+      responses:
+        '200':
+          description: Détails de l'ingredient récupérer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+        '404':
+          description: Ingrédient non Trouvé
+          content:
+            application/json:
+              schema:
+                type: string
+                example: 'Ingredient id = <1> is not found'
+  /ingredients/{ingredientId}/price:
+    put:
+      summary: Mettre à jour de prix d'un ingrédient
+      operationId: putPrice
+      parameters:
+        - name: ingredientId
+          in: path
+          description: Id de l'ingredient à mettre à jour
+          required: true
+          schema:
+            type: string
+            example: '1'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CreatePrice'
+      responses:
+        '200':
+          description: Prix creer avec succes
+          content:
+            application/json:
+              schema:
+                type: string
+  /ingredients/{ingredientId}/stockMouvement:
+    put:
+      summary: Mettre à jour de mouvement de stock d'un ingrédient
+      operationId: putPrice
+      parameters:
+        - name: ingredientId
+          in: path
+          description: Id de l'ingredient à mettre à jour
+          required: true
+          schema:
+            type: string
+            example: '1'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateStock'
+      responses:
+        '200':
+          description: Stock creer avec succes
+          content:
+            application/json:
+              schema:
+                type: string
+  /dishes:
+    get:
+      tags:
+        - Dish
+      summary: Recuperation de la liste des plats
+      operationId: getAllDishes
+      responses:
+        '200':
+          description: Listes des tous les Dish
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DishRest'
+
+  /dishes/{id}/ingredients:
+    put:
+      summary: Ajout de liste d'ingredient dans un plat
+      operationId: putIngredientWithQuantity
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: '1'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/IngredientWithQuantity'
+      responses:
+        '200':
+          description: Ajout des ingredients fini avec succes
+          content:
+            application/json:
+              schema:
+                type: string
+  /orders/{reference}:
+    get:
+      tags:
+        - Order
+      summary: Recuperation d'une commande à l'aide de son Id
+      operationId: getOrderById
+      parameters:
+        - name: reference
+          in: path
+          required: true
+          schema:
+            type: string
+            example: '1'
+      responses:
+        '200':
+          description: Recuperation de la commande
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderRest'
+  /orders/{reference}/dishes:
+    put:
+      summary: Ajouter ou modifier des plats dans une commande
+      operationId: addDish
+      parameters:
+        - name: reference
+          in: path
+          required: true
+          schema:
+            type: string
+            example: '1'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DishOrderRest'
+      responses:
+        '200':
+          description: Modification ou ajout realisé avec succes
+          content:
+            application/json:
+              schema:
+                type: string
+  /orders/{reference}/dishes/{dishId}:
+    put:
+      summary: Changer le status d'une plat
+      operationId: changeSatus
+      parameters:
+        - name: reference
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Id'
+        - name: dishId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Id'
+      responses:
+        '200':
+          description: Status changé avec succes
+          content:
+            application/json:
+              schema:
+                type: string
+  /bestSales/{X}:
+    get:
+      tags:
+        - BestSales
+      summary: Avoir les listes de plats les plus vendus
+      operationId: getAllBestSalesDishes
+      parameters:
+        - name: X
+          in: path
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Listes des plats les plus vendues
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BestSalesDish'
+components:
+  schemas:
+    Ingredient:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+          example: 'Huile'
+        updateDateTime:
+          type: string
+          format: date-time
+          example: "2025-01-01T00:00:00Z"
+        unitPrice:
+          type: number
+          format: double
+          example: 20.0
+        unity:
+          $ref: '#/components/schemas/Unity'
+    IngredientWithQuantity:
+      type: object
+      properties:
+        ingredient:
+          $ref: '#/components/schemas/Ingredient'
+        requiredQuantity:
+          type: number
+          format: double
+        unity:
+          $ref: '#/components/schemas/Unity'
+    IngredientMapper:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+          example: "Huile"
+        unitPrice:
+          type: number
+          format: double
+          example: 20.0
+        ingredientPrice:
+          type: array
+          items:
+            $ref: '#/components/schemas/IngredientPrice'
+        stockRests:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockRest'
+        unity:
+          $ref: '#/components/schemas/Unity'
+    IngredientPrice:
+      type: object
+      properties:
+        unitPrice:
+          type: number
+          format: double
+          example: 2.5
+        date:
+          type: string
+          format: date-time
+          example: "2025-01-01T00:00:00Z"
+    IngredientDishRest:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+        unitPrice:
+          type: number
+          format: double
+        unity:
+          $ref: '#/components/schemas/Unity'
+        stockActual:
+          type: number
+          format: double
+        requiredQuantity:
+          type: number
+          format: double
+    StockRest:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        movement:
+          $ref: '#/components/schemas/Movement'
+        quantity:
+          type: number
+          format: double
+          example: 3.0
+        unity:
+          $ref: '#/components/schemas/Unity'
+        date:
+          type: string
+          format: date-time
+          example: "2025-01-01T00:00:00"
+    Unity:
+      type: string
+      enum: [G,L,U]
+      description: |
+        G - Grammes
+        L - Litres
+        U - Unite
+      example: "G"
+    Movement:
+      type: string
+      enum: [EXIT, ENTER]
+      example: "ENTER"
+    Error:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: Date/heure de l'erreur
+        status:
+          type: integer
+          description: Code HTTP
+        error:
+          type: string
+          description: Type d'erreur
+        message:
+          type: string
+          description: Message descriptif
+        path:
+          type: string
+          description: URI de la requête
+    CreatePrice:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        quantity:
+          type: number
+          format: double
+          example: 20.0
+    CreateStock:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        movement:
+          $ref: '#/components/schemas/Movement'
+        quantity:
+          type: number
+          format: double
+        unity:
+          $ref: '#/components/schemas/Unity'
+    DishRest:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+        unitPrice:
+          type: number
+          format: double
+        ingredient:
+          type: array
+          items:
+            $ref: '#/components/schemas/IngredientDishRest'
+    DishOrderRest:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+        unitPrice:
+          type: integer
+        quantity:
+          type: number
+          format: double
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+    Id:
+      type: string
+      example: '1'
+    OrderStatus:
+      type: string
+      enum: [CREE, CONFIRME,EN_PREPARATION,TERMINE, SERVI]
+    OrderRest:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        dishOrderRests:
+          type: array
+          items:
+            $ref: '#/components/schemas/DishOrderRest'
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+    BestSalesDish:
+      type: object
+      properties:
+        dishName:
+          type: string
+        quantitySale:
+          type: number
+          format: double
+        priceTotal:
+          type: number
+          format: double
